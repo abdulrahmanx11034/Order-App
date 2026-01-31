@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبيق الطلبات</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary-yellow: #FFD700;
+      --dark-yellow: #FFA500;
+      --black: #0A0A0A;
+      --light-black: #1A1A1A;
+      --gray: #2A2A2A;
+      --light-gray: #404040;
+      --white: #FFFFFF;
+      --error: #FF3B3B;
+      --success: #00D26A;
+    }
+    
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, var(--black) 0%, var(--light-black) 100%);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary-yellow), var(--dark-yellow));
+      padding: 30px 20px;
+      border-radius: 0 0 30px 30px;
+      margin: -20px -20px 30px -20px;
+      box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .header h1 {
+      color: var(--black);
+      font-size: 32px;
+      font-weight: 900;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header .user-info {
+      text-align: center;
+      margin-top: 10px;
+      color: var(--black);
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Auth Forms */
+    .auth-container {
+      background: var(--gray);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+      border: 2px solid var(--light-gray);
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary-yellow);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 15px;
+      background: var(--light-black);
+      border: 2px solid var(--light-gray);
+      border-radius: 12px;
+      color: var(--white);
+      font-family: 'Cairo', sans-serif;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-yellow);
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+    }
+    
+    .input-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-yellow), var(--dark-yellow));
+      color: var(--black);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: var(--light-gray);
+      color: var(--white);
+      margin-top: 10px;
+      box-shadow: none;
+    }
+    
+    .btn-secondary::before {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .btn-danger {
+      background: var(--error);
+      color: var(--white);
+      box-shadow: 0 5px 20px rgba(255, 59, 59, 0.3);
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: var(--white);
+      box-shadow: 0 5px 20px rgba(0, 210, 106, 0.3);
+    }
+    
+    .btn-small {
+      width: auto;
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+    
+    /* Orders List */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .empty-state-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+    
+    .empty-state p {
+      color: var(--light-gray);
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+    
+    .order-card {
+      background: var(--gray);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 2px solid var(--light-gray);
+      transition: all 0.3s ease;
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .order-card:hover {
+      transform: translateX(-5px);
+      border-color: var(--primary-yellow);
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .order-id {
+      color: var(--primary-yellow);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .order-name {
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 3px;
+      opacity: 0.9;
+    }
+
+    .order-date-time {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--light-gray);
+      flex-wrap: wrap;
+    }
+
+    .date-info, .time-info {
+      font-size: 13px;
+      color: var(--white);
+      background: var(--light-black);
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .customer-info {
+      background: var(--light-black);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .customer-label {
+      color: var(--light-gray);
+    }
+
+    .customer-name {
+      color: var(--primary-yellow);
+      font-weight: 700;
+      margin: 0 5px;
+    }
+
+    .customer-email {
+      color: var(--light-gray);
+      font-size: 12px;
+    }
+
+    .order-meta-info {
+      margin-bottom: 10px;
+    }
+    
+    .order-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .product-item {
+      background: var(--light-black);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .product-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--gray);
+    }
+    
+    .product-details {
+      flex: 1;
+    }
+    
+    .product-name {
+      font-weight: 700;
+      color: var(--primary-yellow);
+      margin-bottom: 4px;
+    }
+    
+    .product-desc {
+      font-size: 12px;
+      color: var(--light-gray);
+      margin-bottom: 4px;
+    }
+    
+    .product-meta {
+      font-size: 12px;
+      color: var(--white);
+    }
+    
+    .order-address {
+      background: var(--light-black);
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--white);
+    }
+    
+    .order-price {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--light-gray);
+      text-align: left;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-yellow);
+    }
+    
+    .order-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal-content {
+      background: var(--gray);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 2px solid var(--primary-yellow);
+      box-shadow: 0 10px 50px rgba(255, 215, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light-gray);
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-yellow);
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 30px;
+      cursor: pointer;
+      line-height: 1;
+      transition: all 0.3s ease;
+    }
+    
+    .close-btn:hover {
+      color: var(--primary-yellow);
+      transform: rotate(90deg);
+    }
+    
+    .products-list {
+      margin-bottom: 20px;
+    }
+    
+    .add-product-btn {
+      background: var(--light-gray);
+      color: var(--primary-yellow);
+      border: 2px dashed var(--primary-yellow);
+      padding: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+    }
+    
+    .add-product-btn:hover {
+      background: rgba(255, 215, 0, 0.1);
+    }
+    
+    .product-form {
+      background: var(--light-black);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 2px solid var(--light-gray);
+    }
+    
+    .product-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .remove-product-btn {
+      background: var(--error);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-input-label {
+      display: block;
+      padding: 15px;
+      background: var(--gray);
+      border: 2px dashed var(--light-gray);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--light-gray);
+    }
+    
+    .file-input-label:hover {
+      border-color: var(--primary-yellow);
+      color: var(--primary-yellow);
+    }
+    
+    .file-preview {
+      margin-top: 10px;
+      text-align: center;
+    }
+    
+    .file-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 12px;
+    }
+    
+    /* Admin Panel */
+    .admin-code-input {
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: 10px;
+      font-weight: 700;
+    }
+    
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: var(--gray);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid var(--light-gray);
+    }
+    
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary-yellow);
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--light-gray);
+    }
+    
+    .price-input-group {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    
+    .price-input-group .input-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-yellow), var(--dark-yellow));
+      color: var(--black);
+      border: none;
+      font-size: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 25px rgba(255, 215, 0, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+    }
+    
+    .fab:active {
+      transform: scale(0.95);
+    }
+    
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--gray);
+      color: var(--white);
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+      border-left: 4px solid var(--primary-yellow);
+      z-index: 2000;
+      animation: slideInRight 0.3s ease;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast.success {
+      border-left-color: var(--success);
+    }
+    
+    .toast.error {
+      border-left-color: var(--error);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--black);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-yellow);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--dark-yellow);
+    }
+    
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Toast Component
+    function Toast({ message, type, onClose }) {
+      useEffect(() => {
+        const timer = setTimeout(onClose, 3000);
+        return () => clearTimeout(timer);
+      }, [onClose]);
+
+      return (
+        <div className={`toast ${type}`}>
+          {message}
+        </div>
+      );
+    }
+
+    // Auth Component
+    function Auth({ onLogin }) {
+      const [isLogin, setIsLogin] = useState(true);
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [toast, setToast] = useState(null);
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (isLogin) {
+          const users = JSON.parse(localStorage.getItem('users') || '[]');
+          const user = users.find(u => u.email === email && u.password === password);
+          
+          if (user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            onLogin(user);
+            showToast('تم تسجيل الدخول بنجاح!');
+          } else {
+            showToast('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+          }
+        } else {
+          const users = JSON.parse(localStorage.getItem('users') || '[]');
+          
+          if (users.some(u => u.email === email)) {
+            showToast('البريد الإلكتروني مسجل مسبقاً', 'error');
+            return;
+          }
+          
+          const newUser = { name, email, password };
+          users.push(newUser);
+          localStorage.setItem('users', JSON.stringify(users));
+          localStorage.setItem('currentUser', JSON.stringify(newUser));
+          onLogin(newUser);
+          showToast('تم إنشاء الحساب بنجاح!');
+        }
+      };
+
+      return (
+        <>
+          {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+          <div className="header">
+            <h1>مرحباً بك 👋</h1>
+          </div>
+          <div className="auth-container">
+            <form onSubmit={handleSubmit}>
+              {!isLogin && (
+                <div className="input-group">
+                  <label>الاسم</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    placeholder="أدخل اسمك"
+                  />
+                </div>
+              )}
+              <div className="input-group">
+                <label>البريد الإلكتروني</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="example@email.com"
+                />
+              </div>
+              <div className="input-group">
+                <label>كلمة المرور</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                />
+              </div>
+              <button type="submit" className="btn">
+                {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب'}
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-secondary"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin ? 'ليس لديك حساب؟ سجل الآن' : 'لديك حساب؟ سجل دخولك'}
+              </button>
+            </form>
+          </div>
+        </>
+      );
+    }
+
+    // Product Form Component
+    function ProductForm({ product, index, onChange, onRemove }) {
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            onChange(index, 'image', reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      return (
+        <div className="product-form">
+          <div className="product-form-header">
+            <h4 style={{color: 'var(--primary-yellow)'}}>المنتج {index + 1}</h4>
+            <button onClick={() => onRemove(index)} className="remove-product-btn">
+              حذف
+            </button>
+          </div>
+          
+          <div className="input-group">
+            <label>اسم المنتج</label>
+            <input
+              type="text"
+              value={product.name}
+              onChange={(e) => onChange(index, 'name', e.target.value)}
+              required
+              placeholder="مثال: قميص رجالي"
+            />
+          </div>
+          
+          <div className="input-group">
+            <label>الوصف</label>
+            <textarea
+              value={product.description}
+              onChange={(e) => onChange(index, 'description', e.target.value)}
+              required
+              placeholder="وصف تفصيلي للمنتج"
+            />
+          </div>
+          
+          <div className="input-group">
+            <label>الكمية</label>
+            <input
+              type="number"
+              value={product.quantity}
+              onChange={(e) => onChange(index, 'quantity', e.target.value)}
+              required
+              min="1"
+              placeholder="1"
+            />
+          </div>
+          
+          <div className="input-group">
+            <label>المقاس</label>
+            <input
+              type="text"
+              value={product.size}
+              onChange={(e) => onChange(index, 'size', e.target.value)}
+              required
+              placeholder="مثال: XL، 42، M"
+            />
+          </div>
+          
+          <div className="input-group">
+            <label>صورة المنتج</label>
+            <div className="file-input-wrapper">
+              <input
+                type="file"
+                id={`file-${index}`}
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <label htmlFor={`file-${index}`} className="file-input-label">
+                {product.image ? 'تغيير الصورة 📷' : 'اختر صورة للمنتج 📷'}
+              </label>
+            </div>
+            {product.image && (
+              <div className="file-preview">
+                <img src={product.image} alt="معاينة" />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Order Form Modal
+    function OrderFormModal({ onClose, onSubmit, editOrder = null }) {
+      const [orderName, setOrderName] = useState(editOrder ? editOrder.orderName : '');
+      const [products, setProducts] = useState(
+        editOrder ? editOrder.products : [{ name: '', description: '', quantity: 1, size: '', image: '' }]
+      );
+      const [address, setAddress] = useState(editOrder ? editOrder.address : '');
+
+      const addProduct = () => {
+        setProducts([...products, { name: '', description: '', quantity: 1, size: '', image: '' }]);
+      };
+
+      const removeProduct = (index) => {
+        setProducts(products.filter((_, i) => i !== index));
+      };
+
+      const updateProduct = (index, field, value) => {
+        const updated = [...products];
+        updated[index][field] = value;
+        setProducts(updated);
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit({ orderName, products, address }, editOrder ? editOrder.id : null);
+      };
+
+      return (
+        <div className="modal">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="modal-title">{editOrder ? 'تعديل الطلب' : 'طلب جديد'}</h2>
+              <button onClick={onClose} className="close-btn">×</button>
+            </div>
+            
+            <form onSubmit={handleSubmit}>
+              <div className="input-group">
+                <label>اسم الطلبية</label>
+                <input
+                  type="text"
+                  value={orderName}
+                  onChange={(e) => setOrderName(e.target.value)}
+                  required
+                  placeholder="مثال: طلبية ملابس العيد، طلبية المكتب، إلخ..."
+                />
+              </div>
+
+              <div className="products-list">
+                <h3 style={{color: 'var(--white)', marginBottom: '15px'}}>المنتجات</h3>
+                {products.map((product, index) => (
+                  <ProductForm
+                    key={index}
+                    product={product}
+                    index={index}
+                    onChange={updateProduct}
+                    onRemove={removeProduct}
+                  />
+                ))}
+                <div className="add-product-btn" onClick={addProduct}>
+                  + إضافة منتج آخر
+                </div>
+              </div>
+              
+              <div className="input-group">
+                <label>عنوان التوصيل</label>
+                <textarea
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                  placeholder="أدخل العنوان الكامل للتوصيل"
+                />
+              </div>
+              
+              <button type="submit" className="btn">
+                {editOrder ? 'حفظ التعديلات' : 'إرسال الطلب'}
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // Order Card Component
+    function OrderCard({ order, isAdmin, onUpdatePrice, onAccept, onReject, onDelete, onEdit }) {
+      const [price, setPrice] = useState(order.price || '');
+      const [isEditingPrice, setIsEditingPrice] = useState(false);
+
+      const handlePriceSubmit = () => {
+        if (price && parseFloat(price) > 0) {
+          onUpdatePrice(order.id, parseFloat(price));
+          setIsEditingPrice(false);
+        }
+      };
+
+      const handleDelete = () => {
+        if (confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
+          onDelete(order.id);
+        }
+      };
+
+      const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+        
+        const formattedDate = date.toLocaleDateString('ar-SA', dateOptions);
+        const formattedTime = date.toLocaleTimeString('ar-SA', timeOptions);
+        
+        return { date: formattedDate, time: formattedTime };
+      };
+
+      const { date: formattedDate, time: formattedTime } = formatDateTime(order.date);
+
+      return (
+        <div className="order-card">
+          <div className="order-header">
+            <div>
+              <div className="order-id">طلب #{order.id}</div>
+              <div className="order-name">{order.orderName || 'طلبية'}</div>
+            </div>
+            <div className={`order-status status-${order.status}`}>
+              {order.status === 'pending' && 'قيد الانتظار'}
+              {order.status === 'accepted' && 'مقبول'}
+              {order.status === 'rejected' && 'مرفوض'}
+            </div>
+          </div>
+          
+          <div className="order-date-time">
+            <div className="date-info">📅 {formattedDate}</div>
+            <div className="time-info">🕐 {formattedTime}</div>
+          </div>
+          
+          {isAdmin && (
+            <div className="customer-info">
+              <span className="customer-label">👤 العميل:</span>
+              <span className="customer-name">{order.userName}</span>
+              <span className="customer-email">({order.userEmail})</span>
+            </div>
+          )}
+
+          {!isAdmin && (
+            <div className="order-meta-info">
+              <span style={{color: 'var(--light-gray)', fontSize: '14px'}}>
+                تم الطلب بواسطة: <span style={{color: 'var(--primary-yellow)', fontWeight: '600'}}>{order.userName}</span>
+              </span>
+            </div>
+          )}
+          
+          {order.products.map((product, index) => (
+            <div key={index} className="product-item">
+              {product.image && (
+                <img src={product.image} alt={product.name} className="product-image" />
+              )}
+              <div className="product-details">
+                <div className="product-name">{product.name}</div>
+                <div className="product-desc">{product.description}</div>
+                <div className="product-meta">
+                  الكمية: {product.quantity} | المقاس: {product.size}
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          <div className="order-address">
+            📍 {order.address}
+          </div>
+          
+          {order.price && (
+            <div className="order-price">
+              السعر: {order.price} ريال
+            </div>
+          )}
+          
+          {/* User Actions - Only for pending orders */}
+          {!isAdmin && order.status === 'pending' && (
+            <div className="order-actions">
+              <button 
+                className="btn btn-small"
+                onClick={() => onEdit(order)}
+              >
+                ✏️ تعديل
+              </button>
+              <button 
+                className="btn btn-danger btn-small"
+                onClick={handleDelete}
+              >
+                🗑️ حذف
+              </button>
+            </div>
+          )}
+
+          {/* User Actions - For all orders */}
+          {!isAdmin && order.status !== 'pending' && (
+            <div className="order-actions">
+              <button 
+                className="btn btn-danger btn-small"
+                onClick={handleDelete}
+              >
+                🗑️ حذف من السجل
+              </button>
+            </div>
+          )}
+          
+          {/* Admin Actions */}
+          {isAdmin && order.status === 'pending' && (
+            <div className="order-actions">
+              {!isEditingPrice ? (
+                <>
+                  <button 
+                    className="btn btn-small"
+                    onClick={() => setIsEditingPrice(true)}
+                  >
+                    تحديد السعر
+                  </button>
+                  <button 
+                    className="btn btn-success btn-small"
+                    onClick={() => onAccept(order.id)}
+                  >
+                    قبول
+                  </button>
+                  <button 
+                    className="btn btn-danger btn-small"
+                    onClick={() => onReject(order.id)}
+                  >
+                    رفض
+                  </button>
+                </>
+              ) : (
+                <div className="price-input-group">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="السعر بالريال"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <button 
+                    className="btn btn-small"
+                    onClick={handlePriceSubmit}
+                  >
+                    حفظ
+                  </button>
+                  <button 
+                    className="btn btn-secondary btn-small"
+                    onClick={() => setIsEditingPrice(false)}
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Admin Delete for any status */}
+          {isAdmin && (
+            <div className="order-actions" style={{marginTop: '10px'}}>
+              <button 
+                className="btn btn-danger btn-small"
+                onClick={handleDelete}
+              >
+                🗑️ حذف الطلب
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Admin Panel Component
+    function AdminPanel({ onClose }) {
+      const [code, setCode] = useState('');
+      const [isAuthenticated, setIsAuthenticated] = useState(false);
+      const [orders, setOrders] = useState([]);
+      const [toast, setToast] = useState(null);
+
+      const ADMIN_CODE = '7410';
+
+      useEffect(() => {
+        if (isAuthenticated) {
+          loadOrders();
+        }
+      }, [isAuthenticated]);
+
+      const loadOrders = () => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        setOrders(allOrders.sort((a, b) => new Date(b.date) - new Date(a.date)));
+      };
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+      };
+
+      const handleCodeSubmit = (e) => {
+        e.preventDefault();
+        if (code === ADMIN_CODE) {
+          setIsAuthenticated(true);
+          showToast('تم الدخول إلى لوحة التحكم');
+        } else {
+          showToast('الرمز السري غير صحيح', 'error');
+        }
+      };
+
+      const updatePrice = (orderId, price) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const updated = allOrders.map(order => 
+          order.id === orderId ? { ...order, price } : order
+        );
+        localStorage.setItem('orders', JSON.stringify(updated));
+        loadOrders();
+        showToast('تم تحديث السعر');
+      };
+
+      const acceptOrder = (orderId) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const order = allOrders.find(o => o.id === orderId);
+        
+        if (!order.price) {
+          showToast('يجب تحديد السعر أولاً', 'error');
+          return;
+        }
+        
+        const updated = allOrders.map(order => 
+          order.id === orderId ? { ...order, status: 'accepted' } : order
+        );
+        localStorage.setItem('orders', JSON.stringify(updated));
+        loadOrders();
+        showToast('تم قبول الطلب');
+      };
+
+      const rejectOrder = (orderId) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const updated = allOrders.map(order => 
+          order.id === orderId ? { ...order, status: 'rejected' } : order
+        );
+        localStorage.setItem('orders', JSON.stringify(updated));
+        loadOrders();
+        showToast('تم رفض الطلب');
+      };
+
+      const deleteOrder = (orderId) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const updated = allOrders.filter(order => order.id !== orderId);
+        localStorage.setItem('orders', JSON.stringify(updated));
+        loadOrders();
+        showToast('تم حذف الطلب', 'success');
+      };
+
+      const stats = {
+        total: orders.length,
+        pending: orders.filter(o => o.status === 'pending').length,
+        accepted: orders.filter(o => o.status === 'accepted').length,
+        rejected: orders.filter(o => o.status === 'rejected').length
+      };
+
+      return (
+        <div className="modal">
+          {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="modal-title">لوحة التحكم 👨‍💼</h2>
+              <button onClick={onClose} className="close-btn">×</button>
+            </div>
+            
+            {!isAuthenticated ? (
+              <form onSubmit={handleCodeSubmit}>
+                <div className="input-group">
+                  <label>أدخل الرمز السري</label>
+                  <input
+                    type="password"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    required
+                    className="admin-code-input"
+                    maxLength="4"
+                    placeholder="••••"
+                  />
+                </div>
+                <button type="submit" className="btn">
+                  دخول
+                </button>
+              </form>
+            ) : (
+              <>
+                <div className="admin-stats">
+                  <div className="stat-card">
+                    <div className="stat-number">{stats.total}</div>
+                    <div className="stat-label">إجمالي الطلبات</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-number">{stats.pending}</div>
+                    <div className="stat-label">قيد الانتظار</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-number">{stats.accepted}</div>
+                    <div className="stat-label">المقبولة</div>
+                  </div>
+                </div>
+                
+                {orders.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-state-icon">📦</div>
+                    <p>لا توجد طلبات حتى الآن</p>
+                  </div>
+                ) : (
+                  orders.map(order => (
+                    <OrderCard
+                      key={order.id}
+                      order={order}
+                      isAdmin={true}
+                      onUpdatePrice={updatePrice}
+                      onAccept={acceptOrder}
+                      onReject={rejectOrder}
+                      onDelete={deleteOrder}
+                    />
+                  ))
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Main App Component
+    function App() {
+      const [user, setUser] = useState(null);
+      const [orders, setOrders] = useState([]);
+      const [showOrderForm, setShowOrderForm] = useState(false);
+      const [editingOrder, setEditingOrder] = useState(null);
+      const [showAdminPanel, setShowAdminPanel] = useState(false);
+      const [toast, setToast] = useState(null);
+
+      useEffect(() => {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      }, []);
+
+      useEffect(() => {
+        if (user) {
+          loadOrders();
+        }
+      }, [user]);
+
+      const loadOrders = () => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const userOrders = allOrders.filter(order => order.userEmail === user.email);
+        setOrders(userOrders.sort((a, b) => new Date(b.date) - new Date(a.date)));
+      };
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+      };
+
+      const handleLogout = () => {
+        localStorage.removeItem('currentUser');
+        setUser(null);
+        setOrders([]);
+        showToast('تم تسجيل الخروج');
+      };
+
+      const handleOrderSubmit = (orderData, editOrderId = null) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        
+        if (editOrderId) {
+          // Edit existing order
+          const updatedOrders = allOrders.map(order => 
+            order.id === editOrderId 
+              ? { ...order, ...orderData, date: new Date().toISOString() }
+              : order
+          );
+          localStorage.setItem('orders', JSON.stringify(updatedOrders));
+          showToast('تم تحديث الطلب بنجاح! ✏️');
+        } else {
+          // Create new order
+          const newOrder = {
+            id: Date.now(),
+            ...orderData,
+            userEmail: user.email,
+            userName: user.name,
+            date: new Date().toISOString(),
+            status: 'pending',
+            price: null
+          };
+          allOrders.push(newOrder);
+          localStorage.setItem('orders', JSON.stringify(allOrders));
+          showToast('تم إرسال الطلب بنجاح! 🎉');
+        }
+        
+        loadOrders();
+        setShowOrderForm(false);
+        setEditingOrder(null);
+      };
+
+      const handleDeleteOrder = (orderId) => {
+        const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const updatedOrders = allOrders.filter(order => order.id !== orderId);
+        localStorage.setItem('orders', JSON.stringify(updatedOrders));
+        loadOrders();
+        showToast('تم حذف الطلب بنجاح! 🗑️');
+      };
+
+      const handleEditOrder = (order) => {
+        setEditingOrder(order);
+        setShowOrderForm(true);
+      };
+
+      // Triple tap detection for admin panel
+      const [tapCount, setTapCount] = useState(0);
+      const [tapTimer, setTapTimer] = useState(null);
+
+      const handleHeaderTap = () => {
+        if (tapTimer) clearTimeout(tapTimer);
+        
+        const newCount = tapCount + 1;
+        setTapCount(newCount);
+
+        if (newCount === 3) {
+          setShowAdminPanel(true);
+          setTapCount(0);
+        }
+
+        const timer = setTimeout(() => setTapCount(0), 1000);
+        setTapTimer(timer);
+      };
+
+      if (!user) {
+        return <Auth onLogin={setUser} />;
+      }
+
+      return (
+        <>
+          {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+          
+          <div className="header" onClick={handleHeaderTap}>
+            <h1>طلباتي 🛍️</h1>
+            <div className="user-info">{user.name}</div>
+          </div>
+
+          {orders.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">📦</div>
+              <p>لا توجد طلبات حتى الآن</p>
+              <p style={{fontSize: '14px', color: 'var(--light-gray)'}}>
+                اضغط على زر + لإنشاء طلبك الأول
+              </p>
+            </div>
+          ) : (
+            orders.map(order => (
+              <OrderCard 
+                key={order.id} 
+                order={order} 
+                isAdmin={false}
+                onDelete={handleDeleteOrder}
+                onEdit={handleEditOrder}
+              />
+            ))
+          )}
+
+          <button className="fab" onClick={() => {
+            setEditingOrder(null);
+            setShowOrderForm(true);
+          }}>
+            +
+          </button>
+
+          <div style={{textAlign: 'center', marginTop: '30px', marginBottom: '20px'}}>
+            <button className="btn btn-secondary" onClick={handleLogout}>
+              تسجيل الخروج
+            </button>
+          </div>
+
+          {showOrderForm && (
+            <OrderFormModal
+              onClose={() => {
+                setShowOrderForm(false);
+                setEditingOrder(null);
+              }}
+              onSubmit={handleOrderSubmit}
+              editOrder={editingOrder}
+            />
+          )}
+
+          {showAdminPanel && (
+            <AdminPanel onClose={() => setShowAdminPanel(false)} />
+          )}
+        </>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('app'));
+  </script>
+</body>
+</html>
